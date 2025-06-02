@@ -29,6 +29,8 @@ public:
 
     using AuthorContainer = std::vector<std::string>;
 
+    BookDatabase() = default;
+
     BookDatabase(std::initializer_list<Book> list) {
         books_.insert(BooksBegin(), list.begin(), list.end());
     }

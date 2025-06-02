@@ -12,6 +12,18 @@ enum class Genre { Fiction, NonFiction, SciFi, Biography, Mystery, Unknown };
 
 constexpr Genre GenreFromString(std::string_view s) {
     // Ваш код здесь
+    if (s == "Fiction") {
+        return Genre::Fiction;
+    } else if (s == "NonFiction") {
+        return Genre::NonFiction;
+    } else if (s == "SciFi") {
+        return Genre::SciFi;
+    } else if (s == "Biography") {
+        return Genre::Biography;
+    } else if (s == "Mystery") {
+        return Genre::Mystery;
+    }
+
     return Genre::Unknown;
 }
 
@@ -19,7 +31,8 @@ struct Book {
     constexpr Book(Genre genre_) : genre(genre_) {}
     constexpr Book(std::string_view st) { genre = GenreFromString(st); }
 
-    // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом контейнере
+    // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом
+    // контейнере
     std::string_view author;
     std::string title;
 
