@@ -16,6 +16,9 @@ constexpr Genre GenreFromString(std::string_view s) {
 }
 
 struct Book {
+    constexpr Book(Genre genre_) : genre(genre_) {}
+    constexpr Book(std::string_view st) { genre = GenreFromString(st); }
+
     // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом контейнере
     std::string_view author;
     std::string title;
@@ -58,5 +61,15 @@ struct formatter<bookdb::Genre, char> {
 };
 
 // Ваш код для std::formatter<Book> здесь
+template <>
+struct formatter<bookdb::Book, char> {
+    formatter<bookdb::Genre, char> genre_formatter;
 
+    template <typename FormatContext>
+    auto format(const bookdb::Book g, FormatContext &fc) const {
+        return genre_formatter.format(g.genre, fc);
+    }
+
+    constexpr auto parse(format_parse_context &ctx) { return genre_formatter.parse(ctx); }
+};
 }  // namespace std
