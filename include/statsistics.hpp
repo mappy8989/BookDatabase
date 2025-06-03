@@ -46,10 +46,10 @@ auto calculateGenreRatings(const BookDatabase<T> &cont) {
 template <BookContainerLike T>
 auto calculateAverageRating(const BookDatabase<T> &cont) {
 
-    double sum = std::accumulate(cont.begin(), cont.end(), 0.0,
+    double sum = std::accumulate(cont.cbegin(), cont.cend(), 0.0,
                                  [](double acc, const Book &book) { return acc += book.rating; });
 
-    return (sum / std::distance(cont.begin(), cont.end()));
+    return (sum / std::distance(cont.cbegin(), cont.cend()));
 }
 
 template <BookContainerLike T>
@@ -68,19 +68,18 @@ sampleRandomBooks(const BookDatabase<T> &cont, int n) {
 }
 
 template <BookContainerLike T, typename Comparator = TransparentStringLess>
-std::optional<std::vector<std::reference_wrapper<const Book>>> getTopNBy(BookDatabase<T> &cont,
-                                                                         int n) {
-    if (n <= 0 || n > cont.size()) {
+std::vector<std::reference_wrapper<const Book>> getTopNBy(BookDatabase<T> &cont, int n,
+                                                          Comparator comp) {
+    if (n <= 0 || n > (int)cont.size()) {
         std::println("incorrect element size n = {}", n);
-        return std::nullopt;
+        return {};
     }
 
-    Comparator comp;
     std::vector<std::reference_wrapper<const Book>> out;
     out.reserve(n);
     std::sort(cont.begin(), cont.end(), comp);
 
-    out.insert(out.end(), cont.rbegin(), std::next(cont.rbegin(), n));
+    out.insert(out.end(), std::prev(cont.end(), n), cont.end());
 
     return out;
 }
