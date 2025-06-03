@@ -34,8 +34,10 @@ auto calculateGenreRatings(const BookDatabase<T> &cont) {
         histogram[book.genre].second += book.rating;
     }
 
-    for (auto elem : histogram) {
-        average_rating[elem.first] = elem.second.second / elem.second.first;
+    for (const auto &entry : histogram) {
+        Genre genre = entry.first;
+        const auto &stats = entry.second;
+        average_rating[genre] = stats.second / stats.first;
     }
 
     return average_rating;
@@ -43,17 +45,18 @@ auto calculateGenreRatings(const BookDatabase<T> &cont) {
 
 template <BookContainerLike T>
 auto calculateAverageRating(const BookDatabase<T> &cont) {
-    double sum = std::accumulate(cont.BooksBegin(), cont.BooksEnd(), 0.0);
 
-    return (sum / std::distance(cont.BooksBegin(), cont.BooksEnd()));
+    double sum = std::accumulate(cont.begin(), cont.end(), 0.0,
+                                 [](double acc, const Book &book) { return acc += book.rating; });
+
+    return (sum / std::distance(cont.begin(), cont.end()));
 }
 
 template <BookContainerLike T>
 std::optional<std::vector<std::reference_wrapper<const Book>>>
 sampleRandomBooks(const BookDatabase<T> &cont, int n) {
-
     if (n <= 0 || n > cont.size()) {
-        std::cout << "incorrect element size n = " << n << std::endl;
+        std::println("incorrect element size n = {}", n);
         return std::nullopt;
     }
 
@@ -68,16 +71,16 @@ template <BookContainerLike T, typename Comparator = TransparentStringLess>
 std::optional<std::vector<std::reference_wrapper<const Book>>> getTopNBy(BookDatabase<T> &cont,
                                                                          int n) {
     if (n <= 0 || n > cont.size()) {
-        std::cout << "incorrect element size n = " << n << std::endl;
+        std::println("incorrect element size n = {}", n);
         return std::nullopt;
     }
 
     Comparator comp;
     std::vector<std::reference_wrapper<const Book>> out;
     out.reserve(n);
-    std::sort(cont.BooksBegin(), cont.BooksEnd(), comp);
+    std::sort(cont.begin(), cont.end(), comp);
 
-    out.insert(out.end(), cont.BooksRBegin(), std::next(cont.BooksRBegin(), n));
+    out.insert(out.end(), cont.rbegin(), std::next(cont.rbegin(), n));
 
     return out;
 }
