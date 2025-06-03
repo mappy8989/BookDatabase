@@ -1,6 +1,8 @@
 #pragma once
 
+#include <flat_map>
 #include <initializer_list>
+#include <ostream>
 #include <print>
 #include <string>
 #include <string_view>
@@ -32,7 +34,7 @@ public:
     BookDatabase() = default;
 
     BookDatabase(std::initializer_list<Book> list) {
-        books_.insert(BooksBegin(), list.begin(), list.end());
+        books_.insert(begin(), list.begin(), list.end());
     }
 
     void Clear() {
@@ -41,15 +43,31 @@ public:
     }
 
     // Standard container interface methods
-    iterator BooksBegin() { return books_.begin(); }
-    iterator BooksEnd() { return books_.end(); }
+    iterator begin() { return books_.begin(); }
+    iterator end() { return books_.end(); }
 
-    reference EmplaceBack(Book &&book) { return books_.emplace_back(book); }
-    void PushBack(Book &book) { books_.push_back(book); }
+    const_iterator begin() const { return books_.begin(); }
+    const_iterator end() const { return books_.end(); }
+
+    iterator rbegin() { return books_.rbegin(); }
+    iterator rend() { return books_.rend(); }
+
+    template <typename... Args>
+    void EmplaceBack(Args &&...args) {
+        auto ref = books_.emplace_back(std::forward<Args>(args)...);
+        authors_.push_back(std::string(books_.back().author));
+    }
+
+    void PushBack(Book &book) {
+        books_.push_back(book);
+        authors_.push_back(std::string(book.author));
+    }
     // Ваш код здесь
 
-    const BookContainer &GetBooks(void) { return books_; }
-    const AuthorContainer &GetAuthors(void) { return authors_; }
+    const BookContainer &GetBooks(void) const { return books_; }
+    const AuthorContainer &GetAuthors(void) const { return authors_; }
+
+    size_type size() const { return books_.size(); }
 
 private:
     BookContainer books_;
@@ -64,9 +82,6 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
     template <typename FormatContext>
     auto format(const bookdb::BookDatabase<std::vector<bookdb::Book>> &db,
                 FormatContext &fc) const {
-        /*
-        Раскомментируйте, когда bookdb::BookDatabase поддержит интерфейсы, доступные стандартным
-        контейнерам (size/begin/...)
 
         format_to(fc.out(), "BookDatabase (size = {}): ", db.size());
 
@@ -79,7 +94,47 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
         for (const auto &author : db.GetAuthors()) {
             format_to(fc.out(), "- {}\n", author);
         }
-        */
+
+        return fc.out();
+    }
+
+    constexpr auto parse(format_parse_context &ctx) {
+        return ctx.begin();  // Просто игнорируем пользовательский формат
+    }
+};
+
+template <>
+struct formatter<std::flat_map<std::string_view, int>> {
+    template <typename FormatContext>
+    auto format(const std::flat_map<std::string_view, int> &map, FormatContext &fc) const {
+
+        format_to(fc.out(), "Authors (size = {}): ", map.size());
+
+        format_to(fc.out(), "Books number:\n");
+        for (const auto &elem : map) {
+            format_to(fc.out(), "{} - {}\n", elem.first, elem.second);
+        }
+
+        return fc.out();
+    }
+
+    constexpr auto parse(format_parse_context &ctx) {
+        return ctx.begin();  // Просто игнорируем пользовательский формат
+    }
+};
+
+template <>
+struct formatter<std::flat_map<bookdb::Genre, double>> {
+    template <typename FormatContext>
+    auto format(const std::flat_map<bookdb::Genre, double> &map, FormatContext &fc) const {
+
+        format_to(fc.out(), "Genres (size = {}): ", map.size());
+
+        format_to(fc.out(), "Ratings:\n");
+        for (const auto &elem : map) {
+            format_to(fc.out(), "{} - {}\n", elem.first, elem.second);
+        }
+
         return fc.out();
     }
 

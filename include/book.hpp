@@ -30,21 +30,21 @@ constexpr Genre GenreFromString(std::string_view s) {
 struct Book {
     // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом
     // контейнере
-    std::string_view author;
     std::string title;
+    std::string_view author;
 
     int year;
     Genre genre;
     double rating;
     int read_count;
 
-    constexpr Book(std::string_view author_, std::string_view title_, int year_, Genre genre_,
+    constexpr Book(std::string_view title_, std::string_view author_, int year_, Genre genre_,
                    double rating_, int read_count_)
-        : author(author_), title(title_), year(year_), genre(genre_), rating(rating_),
+        : title(title_), author(author_), year(year_), genre(genre_), rating(rating_),
           read_count(read_count_) {}
-    constexpr Book(std::string_view author_, std::string_view title_, int year_,
+    constexpr Book(std::string_view title_, std::string_view author_, int year_,
                    std::string_view genre_, double rating_, int read_count_)
-        : author(author_), title(title_), year(year_), rating(rating_), read_count(read_count_) {
+        : title(title_), author(author_), year(year_), rating(rating_), read_count(read_count_) {
         genre = GenreFromString(genre_);
     }
 };
@@ -85,7 +85,7 @@ struct formatter<bookdb::Book, char> {
 
     template <typename FormatContext>
     auto format(const bookdb::Book g, FormatContext &fc) const {
-        return genre_formatter.format(g.genre, fc);
+        return format_to(fc.out(), "{}, \"{}\", {}, {}", g.author, g.title, g.year, g.genre);
     }
 
     constexpr auto parse(format_parse_context &ctx) { return genre_formatter.parse(ctx); }
