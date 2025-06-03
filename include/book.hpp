@@ -28,9 +28,6 @@ constexpr Genre GenreFromString(std::string_view s) {
 }
 
 struct Book {
-    constexpr Book(Genre genre_) : genre(genre_) {}
-    constexpr Book(std::string_view st) { genre = GenreFromString(st); }
-
     // string_view для экономии памяти, чтобы ссылаться на оригинальную строку, хранящуюся в другом
     // контейнере
     std::string_view author;
@@ -41,7 +38,15 @@ struct Book {
     double rating;
     int read_count;
 
-    // Ваш код для конструкторов здесь
+    constexpr Book(std::string_view author_, std::string_view title_, int year_, Genre genre_,
+                   double rating_, int read_count_)
+        : author(author_), title(title_), year(year_), genre(genre_), rating(rating_),
+          read_count(read_count_) {}
+    constexpr Book(std::string_view author_, std::string_view title_, int year_,
+                   std::string_view genre_, double rating_, int read_count_)
+        : author(author_), title(title_), year(year_), rating(rating_), read_count(read_count_) {
+        genre = GenreFromString(genre_);
+    }
 };
 }  // namespace bookdb
 
