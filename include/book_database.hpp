@@ -46,8 +46,8 @@ public:
     iterator begin() { return books_.begin(); }
     iterator end() { return books_.end(); }
 
-    const_iterator begin() const { return books_.begin(); }
-    const_iterator end() const { return books_.end(); }
+    const_iterator cbegin() const { return books_.cbegin(); }
+    const_iterator cend() const { return books_.cend(); }
 
     iterator rbegin() { return books_.rbegin(); }
     iterator rend() { return books_.rend(); }

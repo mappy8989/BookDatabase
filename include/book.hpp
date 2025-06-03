@@ -85,7 +85,8 @@ struct formatter<bookdb::Book, char> {
 
     template <typename FormatContext>
     auto format(const bookdb::Book g, FormatContext &fc) const {
-        return format_to(fc.out(), "{}, \"{}\", {}, {}", g.author, g.title, g.year, g.genre);
+        return format_to(fc.out(), "{}, \"{}\", {}, {}, {}", g.author, g.title, g.year, g.genre,
+                         g.rating);
     }
 
     constexpr auto parse(format_parse_context &ctx) { return genre_formatter.parse(ctx); }
