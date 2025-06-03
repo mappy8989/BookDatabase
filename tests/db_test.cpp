@@ -14,7 +14,7 @@ TEST(BooksDataBase, PushBackCheck) {
 TEST(BooksDataBase, EmplaceBackCheck) {
     BookDatabase bdb;
 
-    bdb.EmplaceBack({"William Golding", "Lord of the Flies", 1954, Genre::Fiction, 4.2, 89});
+    bdb.EmplaceBack("Lord of the Flies", "William Golding", 1954, Genre::Fiction, 4.2, 89);
     EXPECT_EQ(bdb.GetBooks().at(0).genre, Genre::Fiction);
 }
 

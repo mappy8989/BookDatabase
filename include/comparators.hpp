@@ -12,7 +12,7 @@ struct LessByYear {
     bool operator()(const Book &b1, const Book &b2) { return (b1.year < b2.year); }
 };
 
-struct LessByRating {
+struct LessByPopularity {
     bool operator()(const Book &b1, const Book &b2) { return (b1.rating < b2.rating); }
 };
 
