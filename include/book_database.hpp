@@ -25,6 +25,7 @@ public:
     using const_pointer = const value_type *;
     using iterator = BookContainer::iterator;
     using const_iterator = BookContainer::const_iterator;
+    using reverse_iterator = BookContainer::reverse_iterator;
     using difference_type = std::ptrdiff_t;
     using size_type = std::size_t;
     // Ваш код здесь
@@ -49,8 +50,8 @@ public:
     const_iterator cbegin() const { return books_.cbegin(); }
     const_iterator cend() const { return books_.cend(); }
 
-    iterator rbegin() { return books_.rbegin(); }
-    iterator rend() { return books_.rend(); }
+    reverse_iterator rbegin() { return books_.rbegin(); }
+    reverse_iterator rend() { return books_.rend(); }
 
     template <typename... Args>
     void EmplaceBack(Args &&...args) {

@@ -20,6 +20,10 @@ auto RatingAbove(double rating) {
     return [rating](const Book &book) { return book.rating > rating; };
 }
 
+auto GenreIs(bookdb::Genre genre) {
+    return [genre](const Book &book) { return book.genre == genre; };
+}
+
 template <typename Pred>
 auto all_of(Pred pred) {
     return pred;
@@ -31,9 +35,20 @@ auto all_of(Pred pred, Preds... preds) {
     return [pred, rest = all_of(preds...)](const auto &x) { return pred(x) && rest(x); };
 }
 
+template <typename Pred>
+auto any_of(Pred pred) {
+    return pred;
+}
+
+template <typename Pred, typename... Preds>
+auto any_of(Pred pred, Preds... preds) {
+    return [pred, rest = all_of(preds...)](const auto &x) { return pred(x) || rest(x); };
+}
+
 template <class Iterator, class UnaryPred>
 auto filterBooks(Iterator it_first, Iterator it_last, UnaryPred pred) {
-    std::vector<Book> out;
+    using RefType = typename std::iterator_traits<Iterator>::reference;
+    std::vector<std::reference_wrapper<std::remove_reference_t<RefType>>> out;
 
     for (; it_first != it_last; it_first++) {
         if (pred(*it_first)) {

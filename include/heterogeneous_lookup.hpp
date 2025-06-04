@@ -25,6 +25,23 @@ struct TransparentStringEqual {
     }
 };
 
-struct TransparentStringHash {};
+struct TransparentStringHash {
+    using is_transparent = void;  // Marks this as transparent for heterogeneous lookup
+
+    // Hash for std::string
+    std::size_t operator()(const std::string &s) const noexcept {
+        return std::hash<std::string>{}(s);
+    }
+
+    // Hash for std::string_view
+    std::size_t operator()(std::string_view sv) const noexcept {
+        return std::hash<std::string_view>{}(sv);
+    }
+
+    // Hash for C-style string
+    std::size_t operator()(const char *s) const noexcept {
+        return std::hash<std::string_view>{}(s);
+    }
+};
 
 }  // namespace bookdb

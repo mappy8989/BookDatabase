@@ -4,18 +4,18 @@
 #include <flat_map>
 #include <iterator>
 #include <optional>
+#include <print>
 #include <random>
 #include <stdexcept>
 #include <string_view>
 
 #include "book_database.hpp"
-
-#include <print>
+#include "comparators.hpp"
 
 namespace bookdb {
 
-template <BookContainerLike T, typename Comparator = TransparentStringLess>
-auto buildAuthorHistogramFlat(const BookDatabase<T> &cont, Comparator comp = {}) {
+template <BookContainerLike T>
+auto buildAuthorHistogramFlat(const BookDatabase<T> &cont) {
     std::flat_map<std::string_view, int> histogram;
     for (Book book : cont.GetBooks()) {
         histogram[book.author]++;
@@ -67,7 +67,7 @@ sampleRandomBooks(const BookDatabase<T> &cont, int n) {
     return out;
 }
 
-template <BookContainerLike T, typename Comparator = TransparentStringLess>
+template <BookContainerLike T, typename Comparator = bookdb::comp::LessByPopularity>
 std::vector<std::reference_wrapper<const Book>> getTopNBy(BookDatabase<T> &cont, int n,
                                                           Comparator comp) {
     if (n <= 0 || n > (int)cont.size()) {
