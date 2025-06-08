@@ -30,7 +30,7 @@ public:
     using size_type = std::size_t;
     // Ваш код здесь
 
-    using AuthorContainer = std::vector<std::string>;
+    using AuthorContainer = std::vector<std::string_view>;
 
     BookDatabase() = default;
 
@@ -56,12 +56,12 @@ public:
     template <typename... Args>
     void EmplaceBack(Args &&...args) {
         auto ref = books_.emplace_back(std::forward<Args>(args)...);
-        authors_.push_back(std::string(books_.back().author));
+        authors_.push_back(books_.back().author);
     }
 
     void PushBack(Book &book) {
         books_.push_back(book);
-        authors_.push_back(std::string(book.author));
+        authors_.push_back(book.author);
     }
     // Ваш код здесь
 

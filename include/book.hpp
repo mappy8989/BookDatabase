@@ -44,9 +44,8 @@ struct Book {
           read_count(read_count_) {}
     constexpr Book(std::string_view title_, std::string_view author_, int year_,
                    std::string_view genre_, double rating_, int read_count_)
-        : title(title_), author(author_), year(year_), rating(rating_), read_count(read_count_) {
-        genre = GenreFromString(genre_);
-    }
+        : title(title_), author(author_), year(year_), genre(GenreFromString(genre_)),
+          rating(rating_), read_count(read_count_) {}
 };
 }  // namespace bookdb
 
@@ -81,14 +80,12 @@ struct formatter<bookdb::Genre, char> {
 // Ваш код для std::formatter<Book> здесь
 template <>
 struct formatter<bookdb::Book, char> {
-    formatter<bookdb::Genre, char> genre_formatter;
-
     template <typename FormatContext>
     auto format(const bookdb::Book g, FormatContext &fc) const {
         return format_to(fc.out(), "{}, \"{}\", {}, {}, {}", g.author, g.title, g.year, g.genre,
                          g.rating);
     }
 
-    constexpr auto parse(format_parse_context &ctx) { return genre_formatter.parse(ctx); }
+    constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
 };
 }  // namespace std
