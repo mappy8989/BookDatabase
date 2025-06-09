@@ -105,9 +105,9 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
 };
 
 template <>
-struct formatter<std::flat_map<std::string_view, int>> {
+struct formatter<std::flat_map<std::string, int>> {
     template <typename FormatContext>
-    auto format(const std::flat_map<std::string_view, int> &map, FormatContext &fc) const {
+    auto format(const std::flat_map<std::string, int> &map, FormatContext &fc) const {
 
         format_to(fc.out(), "Authors (size = {}): ", map.size());
 

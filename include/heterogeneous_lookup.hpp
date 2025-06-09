@@ -8,9 +8,11 @@ namespace bookdb {
 struct TransparentStringLess {
     using is_transparent = void;
 
-    bool operator()(const Book &b1, const Book &b2) { return b1.rating < b2.rating; }
-    bool operator()(const Book &b1, const double &rating) { return b1.rating < rating; }
-    bool operator()(const double &rating, const Book &b1) { return this->operator()(b1, rating); }
+    bool operator()(const Book &b1, const Book &b2) { return b1.author < b2.author; }
+    bool operator()(const Book &b1, const std::string_view &author) { return b1.author < author; }
+    bool operator()(const std::string_view &author, const Book &b1) {
+        return this->operator()(b1, author);
+    }
 };
 
 struct TransparentStringEqual {
@@ -36,11 +38,6 @@ struct TransparentStringHash {
     // Hash for std::string_view
     std::size_t operator()(std::string_view sv) const noexcept {
         return std::hash<std::string_view>{}(sv);
-    }
-
-    // Hash for C-style string
-    std::size_t operator()(const char *s) const noexcept {
-        return std::hash<std::string_view>{}(s);
     }
 };
 

@@ -12,7 +12,7 @@ concept BookContainerLike = requires(T &t, typename T::value_type v) { t.push_ba
                             std::same_as<typename T::value_type, bookdb::Book>;
 
 template <typename T>
-concept BookIterator = std::random_access_iterator<T> &&  // рандом-доступный итератор
+concept BookIterator = std::random_access_iterator<T> &&
                        std::same_as<typename std::iterator_traits<T>::value_type, bookdb::Book>;
 
 template <typename S, typename I>
