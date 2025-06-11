@@ -6,7 +6,6 @@
 #include <iterator>
 #include <optional>
 #include <random>
-#include <stdexcept>
 #include <string_view>
 
 #include "book_database.hpp"
@@ -38,9 +37,10 @@ private:
 
 template <BookContainerLike T>
 auto buildAuthorHistogramFlat(const BookDatabase<T> &cont) {
-    std::flat_map<std::string, int> histogram;
+    std::flat_map<std::string_view, int> histogram;
     for (const Book &book : cont.GetBooks()) {
-        histogram[std::string(book.author)]++;
+        auto [it, _] = histogram.insert({book.author, 0});
+        it->second++;
     }
 
     return histogram;
@@ -51,7 +51,8 @@ auto calculateGenreRatings(const BookDatabase<T> &cont) {
     std::flat_map<Genre, GenreStats> histogram;
     std::flat_map<Genre, double> average_rating;
     for (const Book &book : cont.GetBooks()) {
-        histogram.try_emplace(book.genre).first->second.Add(book.rating);
+        auto [it, _] = histogram.try_emplace(book.genre);
+        it->second.Add(book.rating);
     }
 
     for (const auto &entry : histogram) {
@@ -76,7 +77,7 @@ template <BookContainerLike T>
 std::optional<std::vector<std::reference_wrapper<const Book>>>
 sampleRandomBooks(const BookDatabase<T> &cont, int n) {
     if (n <= 0 || n > cont.size()) {
-        std::cerr << "Incorrect element size n = " << n << std::endl;
+        std::println(std::cerr, "Incorrect element size n = {}", n);
         return std::nullopt;
     }
 
@@ -91,14 +92,18 @@ template <BookContainerLike T, typename Comparator = bookdb::comp::LessByPopular
 std::vector<std::reference_wrapper<const Book>> getTopNBy(BookDatabase<T> &cont, int n,
                                                           Comparator comp) {
     if (n <= 0 || n > (int)cont.size()) {
-        std::cerr << "Incorrect element size n = " << n << std::endl;
+        std::println(std::cerr, "Incorrect element size n = {}", n);
         return {};
     }
 
     std::vector<std::reference_wrapper<const Book>> out;
     out.reserve(n);
-    std::nth_element(cont.begin(), cont.end() - n, cont.end(), comp);
-    std::sort(cont.end() - n, cont.end(), comp);
+    if (log(cont.size()) > 2 * n) {
+        std::nth_element(cont.begin(), cont.end() - n, cont.end(), comp);
+        std::sort(cont.end() - n, cont.end(), comp);
+    } else {
+        std::sort(cont.begin(), cont.end(), comp);
+    }
 
     out.insert(out.end(), std::prev(cont.end(), n), cont.end());
 

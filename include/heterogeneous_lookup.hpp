@@ -10,7 +10,7 @@ struct TransparentStringLess {
 
     bool operator()(const Book &b1, const Book &b2) { return b1.author < b2.author; }
     bool operator()(const Book &b1, const std::string_view &author) { return b1.author < author; }
-    bool operator()(const std::string_view &author, const Book &b1) {
+    bool operator()(const std::string_view author, const Book &b1) {
         return this->operator()(b1, author);
     }
 };

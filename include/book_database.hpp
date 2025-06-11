@@ -1,5 +1,6 @@
 #pragma once
 
+#include <deque>
 #include <flat_map>
 #include <initializer_list>
 #include <ostream>
@@ -30,7 +31,7 @@ public:
     using size_type = std::size_t;
     // Ваш код здесь
 
-    using AuthorContainer = std::vector<std::string_view>;
+    using AuthorContainer = std::deque<std::string>;
 
     BookDatabase() = default;
 
@@ -55,13 +56,14 @@ public:
 
     template <typename... Args>
     void EmplaceBack(Args &&...args) {
-        auto ref = books_.emplace_back(std::forward<Args>(args)...);
-        authors_.push_back(books_.back().author);
+        books_.emplace_back(std::forward<Args>(args)...);
+        authors_.push_back(std::string(books_.back().author));
+        books_.back().author = authors_.back();
     }
-
-    void PushBack(Book &book) {
-        books_.push_back(book);
-        authors_.push_back(book.author);
+    void PushBack(Book book) {
+        authors_.push_back(std::string(book.author));
+        book.author = authors_.back();
+        books_.push_back(std::move(book));
     }
     // Ваш код здесь
 
@@ -105,9 +107,9 @@ struct formatter<bookdb::BookDatabase<std::vector<bookdb::Book>>> {
 };
 
 template <>
-struct formatter<std::flat_map<std::string, int>> {
+struct formatter<std::flat_map<std::string_view, int>> {
     template <typename FormatContext>
-    auto format(const std::flat_map<std::string, int> &map, FormatContext &fc) const {
+    auto format(const std::flat_map<std::string_view, int> &map, FormatContext &fc) const {
 
         format_to(fc.out(), "Authors (size = {}): ", map.size());
 
