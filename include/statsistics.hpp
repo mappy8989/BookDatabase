@@ -39,7 +39,7 @@ template <BookContainerLike T>
 auto buildAuthorHistogramFlat(const BookDatabase<T> &cont) {
     std::flat_map<std::string_view, int> histogram;
     for (const Book &book : cont.GetBooks()) {
-        auto [it, _] = histogram.insert({book.author, 0});
+        auto [it, _] = histogram.try_emplace(book.author, 0u);
         it->second++;
     }
 

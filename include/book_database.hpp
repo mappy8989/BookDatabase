@@ -1,12 +1,12 @@
 #pragma once
 
-#include <deque>
 #include <flat_map>
 #include <initializer_list>
 #include <ostream>
 #include <print>
 #include <string>
 #include <string_view>
+#include <unordered_set>
 #include <vector>
 
 #include "book.hpp"
@@ -31,12 +31,15 @@ public:
     using size_type = std::size_t;
     // Ваш код здесь
 
-    using AuthorContainer = std::deque<std::string>;
+    using AuthorContainer = std::unordered_set<std::string>;
 
     BookDatabase() = default;
 
     BookDatabase(std::initializer_list<Book> list) {
-        books_.insert(begin(), list.begin(), list.end());
+        books_.reserve(list.size());
+        for (const auto &book : list) {
+            EmplaceBack(book);  // Используем EmplaceBack для каждого элемента
+        }
     }
 
     void Clear() {
@@ -57,12 +60,12 @@ public:
     template <typename... Args>
     void EmplaceBack(Args &&...args) {
         books_.emplace_back(std::forward<Args>(args)...);
-        authors_.push_back(std::string(books_.back().author));
-        books_.back().author = authors_.back();
+        auto [it, _] = authors_.insert(std::string(books_.back().author));
+        books_.back().author = *it;
     }
     void PushBack(Book book) {
-        authors_.push_back(std::string(book.author));
-        book.author = authors_.back();
+        auto [it, _] = authors_.insert(std::string(book.author));
+        book.author = *it;
         books_.push_back(std::move(book));
     }
     // Ваш код здесь
